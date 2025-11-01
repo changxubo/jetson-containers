@@ -1,0 +1,51 @@
+import asyncio
+import websockets
+import subprocess
+import shlex
+
+# The URL of your WebSocket stream
+WEBSOCKET_URL = "ws://localhost:7860/ws"
+
+# The URL where ZLMediaKit will receive the stream
+ZLMEDIAKIT_RTSP_URL = "rtsp://10.142.94.37:30554/live/nanoowl"
+
+async def websocket_to_rtsp():
+    print(f"Connecting to WebSocket at {WEBSOCKET_URL}")
+
+    # The FFmpeg command to push H.264 data to ZLMediaKit
+    # Assuming the WebSocket sends raw H.264 video. Adjust if different.
+    ffmpeg_cmd = (
+        f"ffmpeg -i - "  # Input from stdin
+        f"-c:v copy "    # Copy video codec without re-encoding
+        f"-c:a copy "    # Copy audio codec (if any)
+        f"-f rtsp -rtsp_transport tcp {ZLMEDIAKIT_RTSP_URL}"
+    )
+
+    # Use subprocess.Popen to run FFmpeg and pipe stdin
+    ffmpeg_proc = subprocess.Popen(shlex.split(ffmpeg_cmd), stdin=subprocess.PIPE, shell=False)
+
+    try:
+        async with websockets.connect(WEBSOCKET_URL) as ws:
+            print("WebSocket connected. Starting stream push to ZLMediaKit.")
+            await ws.send("prompt:[a person[a hand,a foot],a mobile phone, a Hangbaiju plant[a Hangbaiju leaf, a Hangbaiju flower bud], a flowerpot]")
+            while True:
+                # Receive a message (frame) from the WebSocket
+                frame = await ws.recv()
+                
+                # Write the frame to FFmpeg's standard input
+                if isinstance(frame, bytes):
+                    ffmpeg_proc.stdin.write(frame)
+                    
+    except websockets.exceptions.ConnectionClosed:
+        print("WebSocket connection closed.")
+    except ConnectionRefusedError:
+        print("Could not connect to WebSocket. Is the server running?")
+    finally:
+        print("Terminating FFmpeg process.")
+        ffmpeg_proc.stdin.close()
+        ffmpeg_proc.wait()
+
+if __name__ == '__main__':
+    # Make sure to replace with your actual WebSocket and ZLMediaKit URLs
+    asyncio.run(websocket_to_rtsp())
+
