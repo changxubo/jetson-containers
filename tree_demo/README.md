@@ -38,3 +38,10 @@ jetson-containers run dustynv/nanoowl:r36.4.1
 
 docker logs jetson_container_20251030_161500 -f  # to view logs
 ```
+
+## Health Check
+```bash
+docker ps -a  # check all containers
+docker logs jetson_container_20251030_161500 -f  # to view logs
+docker restart jetson_container_20251030_161500  # start container if not running
+``` 

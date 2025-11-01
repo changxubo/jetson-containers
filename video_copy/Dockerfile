@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy your Python script into the container
-COPY demo.py .
+COPY main.py .
 
 # Expose any necessary ports, if applicable.
 # ZLMediaKit is on port 8554 and your WebSocket is on 7860, but this container
