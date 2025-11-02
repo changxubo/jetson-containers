@@ -37,6 +37,9 @@ Modify run.sh with 'docker run -d --restart unless-stopped -id' to run container
 jetson-containers run dustynv/nanoowl:r36.4.1
 
 docker logs jetson_container_20251030_161500 -f  # to view logs
+
+
+https://github.com/changxubo/jetson-containers
 ```
 
 ## Health Check

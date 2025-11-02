@@ -99,3 +99,14 @@ sudo docker run -d --restart unless-stopped -id --network host --name video_copy
 
 docker logs video_copy -f  # to view logs
 ```
+
+
+
+## Install as a Systemd Service
+```bash
+sudo chmod +x /home/unitree/video_copy/main.py
+sudo cp /home/unitree/video_copy/vcopy.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable vcopy.service
+sudo systemctl start vcopy.service
+```
